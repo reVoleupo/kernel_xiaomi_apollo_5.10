@@ -1,0 +1,105 @@
+# Compiled objects
+*.o
+*.o.*
+*.ko
+*.mod
+*.mod.c
+*.mod.o
+*.a
+*.s
+*.so
+*.so.dbg
+*.lst
+*.symtypes
+*.order
+*.elf
+*.bin
+*.dtb
+*.dtbo
+*.img
+
+# Kernel build outputs
+vmlinux
+vmlinux.o
+vmlinux.bin
+vmlinux.gz
+Image
+Image.gz
+Image.bz2
+Image.lz4
+Image.lzma
+Image.lzo
+System.map
+Module.symvers
+modules.builtin
+modules.builtin.modinfo
+modules.order
+.tmp_vmlinux*
+*.tmp
+*.tmp.*
+
+# Build config
+.config
+.config.old
+*.orig
+*.rej
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ctags
+tags
+TAGS
+cscope.*
+
+# AnyKernel3 build outputs (keep template, exclude generated zips)
+anykernel/*.zip
+anykernel/zImage
+anykernel/dtb
+anykernel/dtbo
+anykernel/Image.gz
+anykernel/*.img
+
+# Output
+output/
+*.zip
+
+# Build intermediate files
+*.cmd
+*.d
+*.dwo
+*.su
+*.tmp
+*.mod
+modules.builtin.modinfo
+.tmp_*
+.version
+.vmlinux.cmd
+.missing-syscalls.d
+include/config/
+include/generated/
+usr/initramfs_data.cpio
+include/generated/
+arch/*/include/generated/
+
+# Generated source files
+*.asn1.c
+*.asn1.h
+*.lex.c
+*.tab.c
+*.tab.h
+config_data.gz
+vmlinux.symvers
+*.symvers
+
+# AnyKernel3 artifacts
+anykernel/Image.gz
+anykernel/dtb
+anykernel/*.zip
+
+# Output
+output/

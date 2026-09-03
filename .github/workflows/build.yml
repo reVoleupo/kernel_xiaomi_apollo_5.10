@@ -1,0 +1,127 @@
+name: Apollo Kernel Build
+
+on:
+  push:
+    branches: [ main, master, android12-5.10-* ]
+    paths-ignore:
+      - '**.md'
+      - 'Documentation/**'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  KERNEL_VERSION: 5.10.236
+  DEFCONFIG: apollo_defconfig
+  ARCH: arm64
+
+jobs:
+  build:
+    name: Build Kernel (clang)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout kernel source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison flex libelf-dev libssl-dev \
+            python3 python3-pip \
+            build-essential gcc-aarch64-linux-gnu \
+            device-tree-compiler \
+            zip unzip wget curl git
+
+      - name: Setup Proton Clang 13
+        run: |
+          # Download Proton Clang (or use system clang as fallback)
+          if [ ! -d "$HOME/proton-clang" ]; then
+            echo "Downloading Proton Clang 13..."
+            wget -q https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210811.tar.gz -O proton-clang.tar.gz || true
+            if [ -f proton-clang.tar.gz ]; then
+              mkdir -p $HOME/proton-clang
+              tar xzf proton-clang.tar.gz -C $HOME/proton-clang --strip-components=1
+            else
+              echo "Proton Clang download failed, using system clang"
+              sudo apt-get install -y clang lld llvm
+              export PATH="/usr/lib/llvm-14/bin:$PATH"
+            fi
+          fi
+          echo "CLANG_PATH=$HOME/proton-clang/bin" >> $GITHUB_ENV
+
+      - name: Verify toolchain
+        run: |
+          export PATH="$HOME/proton-clang/bin:$PATH"
+          which clang && clang --version | head -1
+          which ld.lld && ld.lld --version | head -1
+          which aarch64-linux-gnu-gcc || echo "Using clang as cross-compiler"
+
+      - name: Generate defconfig
+        run: |
+          export PATH="$HOME/proton-clang/bin:$PATH"
+          make CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm \
+               OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip \
+               CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64 $DEFCONFIG
+
+      - name: Build kernel Image + dtbs
+        run: |
+          export PATH="$HOME/proton-clang/bin:$PATH"
+          make -j$(nproc) CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm \
+               OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip \
+               CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64 \
+               Image dtbs 2>&1 | tee build.log
+
+      - name: Check build result
+        run: |
+          if [ -f arch/arm64/boot/Image ]; then
+            echo "✓ Kernel Image built successfully"
+            ls -lh arch/arm64/boot/Image
+          else
+            echo "✗ Kernel Image NOT found"
+            exit 1
+          fi
+          if [ -f arch/arm64/boot/dts/qcom/apollo-sm8250.dtb ]; then
+            echo "✓ apollo-sm8250.dtb built successfully"
+            ls -lh arch/arm64/boot/dts/qcom/apollo-sm8250.dtb
+          else
+            echo "✗ apollo-sm8250.dtb NOT found"
+            exit 1
+          fi
+
+      - name: Create Image.gz
+        run: |
+          gzip -k -f arch/arm64/boot/Image
+          ls -lh arch/arm64/boot/Image.gz
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p artifacts
+          cp arch/arm64/boot/Image artifacts/
+          cp arch/arm64/boot/Image.gz artifacts/
+          cp arch/arm64/boot/dts/qcom/apollo-sm8250.dtb artifacts/
+          cp .config artifacts/kernel.config
+          cp build.log artifacts/ 2>/dev/null || true
+          echo "Kernel version: $KERNEL_VERSION" > artifacts/BUILD_INFO.txt
+          echo "Build date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> artifacts/BUILD_INFO.txt
+          echo "Commit: $(git rev-parse --short HEAD)" >> artifacts/BUILD_INFO.txt
+          echo "Compiler: $(clang --version | head -1)" >> artifacts/BUILD_INFO.txt
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apollo-kernel-${{ env.KERNEL_VERSION }}-${{ github.sha }}
+          path: artifacts/
+          retention-days: 30
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.sha }}
+          path: build.log
+          retention-days: 7

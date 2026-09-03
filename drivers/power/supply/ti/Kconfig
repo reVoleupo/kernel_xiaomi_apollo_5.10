@@ -1,0 +1,6 @@
+config CHARGER_BQ2597X
+	tristate "TI BQ2597x charge pump driver"
+	depends on I2C
+	help
+	  Say Y to enable support for TI BQ25970/BQ2597x I2C charge pump.
+	  Used on Xiaomi apollo (Redmi K30S Ultra) for 33W charging.

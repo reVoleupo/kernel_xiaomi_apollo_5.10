@@ -1,0 +1,6 @@
+config INPUT_AW8697_HAPTIC
+	tristate "AW8697 haptic vibrator driver"
+	depends on I2C
+	help
+	  Say Y to enable support for the AW8697 I2C haptic vibrator.
+	  Used on Xiaomi apollo (Redmi K30S Ultra).

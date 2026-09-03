@@ -1,0 +1,12 @@
+#
+# Novatek NT36xxx touchscreen driver configuration
+#
+
+config TOUCHSCREEN_NT36XXX_HOSTDL_SPI
+	tristate "Novatek NT36xxx host download SPI touchscreen driver"
+	depends on SPI
+	help
+	  Say Y here if you have a Novatek NT36xxx (NT36523/NT36672/NT36675)
+	  touchscreen connected via SPI bus. Used on Xiaomi apollo (Redmi K30S Ultra).
+
+	  If unsure, say N.
