@@ -836,6 +836,7 @@ static const struct dev_pm_ops spi_geni_pm_ops = {
 
 static const struct of_device_id spi_geni_dt_match[] = {
 	{ .compatible = "qcom,geni-spi" },
+	{ .compatible = "qcom,spi-geni" },
 	{}
 };
 MODULE_DEVICE_TABLE(of, spi_geni_dt_match);

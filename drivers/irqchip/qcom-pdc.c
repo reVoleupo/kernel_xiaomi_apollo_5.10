@@ -518,6 +518,7 @@ static int qcom_pdc_probe(struct platform_device *pdev)
 
 static const struct of_device_id qcom_pdc_match_table[] = {
 	{ .compatible = "qcom,pdc" },
+	{ .compatible = "qcom,kona-pdc" },
 	{}
 };
 MODULE_DEVICE_TABLE(of, qcom_pdc_match_table);

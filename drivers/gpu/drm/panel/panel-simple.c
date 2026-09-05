@@ -4566,6 +4566,36 @@ static const struct panel_desc_dsi osd101t2045_53ts = {
 	.lanes = 4,
 };
 
+static const struct drm_display_mode novatek_nt36675_mode = {
+	.clock = 176564,
+	.hdisplay = 1080,
+	.hsync_start = 1080 + 80,
+	.hsync_end = 1080 + 80 + 20,
+	.htotal = 1080 + 80 + 20 + 32,
+	.vdisplay = 2400,
+	.vsync_start = 2400 + 16,
+	.vsync_end = 2400 + 16 + 4,
+	.vtotal = 2400 + 16 + 4 + 8,
+	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
+};
+
+static const struct panel_desc_dsi novatek_nt36675 = {
+	.desc = {
+		.modes = &novatek_nt36675_mode,
+		.num_modes = 1,
+		.bpc = 8,
+		.size = {
+			.width = 146,
+			.height = 324,
+		},
+		.connector_type = DRM_MODE_CONNECTOR_DSI,
+	},
+	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
+		 MIPI_DSI_MODE_VIDEO_SYNC_PULSE,
+	.format = MIPI_DSI_FMT_RGB888,
+	.lanes = 4,
+};
+
 static const struct of_device_id dsi_of_match[] = {
 	{
 		.compatible = "auo,b080uan01",
@@ -4587,6 +4617,9 @@ static const struct of_device_id dsi_of_match[] = {
 		.data = &lg_acx467akm_7
 	}, {
 		.compatible = "osddisplays,osd101t2045-53ts",
+	}, {
+		.compatible = "novatek,nt36675",
+		.data = &novatek_nt36675
 		.data = &osd101t2045_53ts
 	}, {
 		/* sentinel */

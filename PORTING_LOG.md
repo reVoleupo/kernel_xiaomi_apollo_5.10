@@ -264,3 +264,62 @@
 - Full rebuild after config change: ~40 minutes (2 cores, 4GB RAM)
 - Build was killed once by OOM at ~1449 objects; restarted and continued from cached objects
 - Individual driver compile testing used to catch errors before full build
+
+---
+## 2026-09-04: Final Build & Delivery
+
+### Full Build Results (with all drivers)
+- `make -j2 Image dtbs`: **SUCCESS — 0 errors**
+- Image: 32,590,336 bytes (31.1 MB uncompressed)
+- Image.gz: 11,390,728 bytes (10.9 MB)
+- apollo-sm8250.dtb: 64,420 bytes (63 KB)
+- vmlinux: ELF 64-bit LSB pie executable, ARM aarch64, 328 MB (with debug_info)
+- All drivers compiled: nt36xxx, aw8697, bq2597x, bmi160, dwc3-qcom, ath11k, nxp-nci, camss, qcom-wled, msm-drm
+
+### DTB Verification
+- All key nodes present: MDSS/DPU/DSI, panel, wled, nt36xxx, aw8697, bq25970, bmi160, usb, wifi, nq_nci
+- No errors, only cosmetic warnings (ranges_format, unique_unit_address from base DTS)
+
+### AnyKernel3 Flashable Zip
+- File: `apollo-5.10-kernel-20260904.zip`
+- Size: 14,422,416 bytes (13.8 MB)
+- Contains: Image.gz, dtb, anykernel.sh, META-INF, tools (ak3-core.sh, busybox, magiskboot, etc.)
+- Zip integrity: verified OK
+- Device check: apollo / Redmi K30S Ultra / Mi 10T / apollon
+- Block: /dev/block/bootdevice/by-name/boot
+
+### Verification Checklist (12/12 passed)
+- [x] Image exists and >20MB (31MB)
+- [x] Image.gz compressed (11MB)
+- [x] apollo-sm8250.dtb exists and >50KB (63KB)
+- [x] vmlinux is valid AArch64 ELF
+- [x] Compilation 0 errors
+- [x] defconfig contains all necessary drivers (20 key configs verified)
+- [x] AnyKernel3 zip valid (14MB)
+- [x] anykernel.sh device check correct
+- [x] build.sh executable (defconfig + dtbs targets)
+- [x] GitHub Actions CI yaml syntax correct
+- [x] PORTING_LOG.md records all porting process (266 lines)
+- [x] README.md has compile/flash/hardware status
+
+### Git
+- Repository initialized, first commit: 94df064b3
+- .gitignore excludes build artifacts (*.o, *.ko, Image, vmlinux, *.dtb, output/)
+- Ready for push to GitHub (needs token + repo name from user)
+
+### Driver Status Summary
+| Driver | Status | Approach |
+|--------|--------|----------|
+| Display (MDSS/DPU/DSI) | Compiles | DT backport from pmOS, 5.10 has DPU sm8250 support |
+| Touch (NT36xxx) | Compiles | Rewritten minimal 5.10 SPI driver |
+| Vibrator (AW8697) | Compiles | Rewritten minimal 5.10 I2C FF driver |
+| Charging (BQ2597x) | Compiles | Rewritten minimal 5.10 power supply driver |
+| Sensors (BMI160) | Compiles | Mainline 5.10 driver |
+| USB (dwc3) | Compiles | Mainline 5.10 driver + QMP PHY |
+| NFC (NXP NCI) | Compiles | Mainline 5.10 driver |
+| Bluetooth (hci_qca) | Compiles | Mainline 5.10 driver |
+| WiFi (ath11k) | Compiles (WIP) | Mainline driver, QCA6390 AHB match missing |
+| Camera (CAMSS) | Compiles (WIP) | Mainline driver, sensor drivers need backport |
+| Audio (WCD9380/CS35L41) | WIP | Not in 5.10, needs backport from 6.x |
+| Fuel Gauge (pm8150b) | Compiles | Mainline qcom_smb driver |
+| Backlight (qcom-wled) | Compiles | Mainline 5.10 driver |

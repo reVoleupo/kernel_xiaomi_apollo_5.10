@@ -22,6 +22,8 @@
 / {
 	model = "Xiaomi Redmi K30S Ultra";
 	compatible = "xiaomi,apollo", "qcom,sm8250";
+	qcom,msm-id = <0x164 0x10000>;
+	qcom,board-id = <0x00 0x00>;
 
 	aliases {
 		serial0 = &uart12;
@@ -71,6 +73,22 @@
 			gpio-key,wakeup;
 			debounce-interval = <15>;
 			linux,can-disable;
+		};
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		ramoops@AFF00000 {
+			compatible = "ramoops";
+			reg = <0x0 0xaff00000 0x0 0x100000>;
+			ecc-size = <0>;
+			console-size = <0x80000>;
+			pmsg-size = <0x40000>;
+			ftrace-size = <0>;
+			record-size = <0x40000>;
 		};
 	};
 };

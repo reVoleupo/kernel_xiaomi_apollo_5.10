@@ -727,6 +727,7 @@ static const struct dev_pm_ops geni_i2c_pm_ops = {
 
 static const struct of_device_id geni_i2c_dt_match[] = {
 	{ .compatible = "qcom,geni-i2c" },
+	{ .compatible = "qcom,i2c-geni" },
 	{}
 };
 MODULE_DEVICE_TABLE(of, geni_i2c_dt_match);

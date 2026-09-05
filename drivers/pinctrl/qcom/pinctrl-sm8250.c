@@ -1350,6 +1350,7 @@ static int sm8250_pinctrl_probe(struct platform_device *pdev)
 
 static const struct of_device_id sm8250_pinctrl_of_match[] = {
 	{ .compatible = "qcom,sm8250-pinctrl", },
+	{ .compatible = "qcom,kona-pinctrl", },
 	{ },
 };
 

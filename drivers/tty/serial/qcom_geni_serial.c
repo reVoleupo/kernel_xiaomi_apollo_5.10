@@ -1546,6 +1546,8 @@ static const struct dev_pm_ops qcom_geni_serial_pm_ops = {
 static const struct of_device_id qcom_geni_serial_match_table[] = {
 	{ .compatible = "qcom,geni-debug-uart", },
 	{ .compatible = "qcom,geni-uart", },
+	{ .compatible = "qcom,msm-geni-console", },
+	{ .compatible = "qcom,msm-geni-serial-hs", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, qcom_geni_serial_match_table);

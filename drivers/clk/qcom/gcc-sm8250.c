@@ -3626,6 +3626,7 @@ static const struct qcom_cc_desc gcc_sm8250_desc = {
 
 static const struct of_device_id gcc_sm8250_match_table[] = {
 	{ .compatible = "qcom,gcc-sm8250" },
+	{ .compatible = "qcom,gcc-kona" },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, gcc_sm8250_match_table);

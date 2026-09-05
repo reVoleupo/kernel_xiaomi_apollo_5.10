@@ -519,6 +519,7 @@ static const struct of_device_id clk_rpmh_match_table[] = {
 	{ .compatible = "qcom,sdm845-rpmh-clk", .data = &clk_rpmh_sdm845},
 	{ .compatible = "qcom,sm8150-rpmh-clk", .data = &clk_rpmh_sm8150},
 	{ .compatible = "qcom,sm8250-rpmh-clk", .data = &clk_rpmh_sm8250},
+	{ .compatible = "qcom,kona-rpmh-clk", .data = &clk_rpmh_sm8250},
 	{ }
 };
 MODULE_DEVICE_TABLE(of, clk_rpmh_match_table);
