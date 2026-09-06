@@ -1362,7 +1362,7 @@ endif
 ifneq "$(CC)" "clang"
 include/config/auto.conf: FORCE
 endif
-ifneq "$(LD)" "ld.lld"
+ifneq "$(LD)" "aarch64-linux-gnu-ld"
 include/config/auto.conf: FORCE
 endif
 ifneq "$(srctree)" "."
@@ -1380,13 +1380,13 @@ endif
 ifneq "$(CC_VERSION_TEXT)" "Proton clang version 13.0.0 (https://github.com/llvm/llvm-project b4fd512c36ca344a3ff69350219e8b0a67e9472a)"
 include/config/auto.conf: FORCE
 endif
-ifneq "$(NM)" "llvm-nm"
+ifneq "$(NM)" "aarch64-linux-gnu-nm"
 include/config/auto.conf: FORCE
 endif
-ifneq "$(OBJCOPY)" "llvm-objcopy"
+ifneq "$(OBJCOPY)" "aarch64-linux-gnu-objcopy"
 include/config/auto.conf: FORCE
 endif
-ifneq "$(AR)" "llvm-ar"
+ifneq "$(AR)" "aarch64-linux-gnu-ar"
 include/config/auto.conf: FORCE
 endif
 

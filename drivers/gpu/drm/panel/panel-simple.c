@@ -4617,10 +4617,10 @@ static const struct of_device_id dsi_of_match[] = {
 		.data = &lg_acx467akm_7
 	}, {
 		.compatible = "osddisplays,osd101t2045-53ts",
+		.data = &osd101t2045_53ts
 	}, {
 		.compatible = "novatek,nt36675",
 		.data = &novatek_nt36675
-		.data = &osd101t2045_53ts
 	}, {
 		/* sentinel */
 	}
