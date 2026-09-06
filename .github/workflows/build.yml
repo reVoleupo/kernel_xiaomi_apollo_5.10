@@ -37,40 +37,22 @@ jobs:
             device-tree-compiler \
             zip unzip wget curl git
 
-      - name: Setup Proton Clang 13
+      - name: Install LLVM/Clang toolchain
         run: |
-          # Download Proton Clang (or use system clang as fallback)
-          if [ ! -d "$HOME/proton-clang" ]; then
-            echo "Downloading Proton Clang 13..."
-            wget -q https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210811.tar.gz -O proton-clang.tar.gz || true
-            if [ -f proton-clang.tar.gz ]; then
-              mkdir -p $HOME/proton-clang
-              tar xzf proton-clang.tar.gz -C $HOME/proton-clang --strip-components=1
-            else
-              echo "Proton Clang download failed, using system clang"
-              sudo apt-get install -y clang lld llvm
-              export PATH="/usr/lib/llvm-14/bin:$PATH"
-            fi
-          fi
-          echo "CLANG_PATH=$HOME/proton-clang/bin" >> $GITHUB_ENV
-
-      - name: Verify toolchain
-        run: |
-          export PATH="$HOME/proton-clang/bin:$PATH"
-          which clang && clang --version | head -1
-          which ld.lld && ld.lld --version | head -1
-          which aarch64-linux-gnu-gcc || echo "Using clang as cross-compiler"
+          sudo apt-get install -y clang lld llvm
+          echo "Using system clang:"
+          clang --version | head -1
+          ld.lld --version | head -1
+          which aarch64-linux-gnu-gcc
 
       - name: Generate defconfig
         run: |
-          export PATH="$HOME/proton-clang/bin:$PATH"
           make CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm \
                OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip \
                CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64 $DEFCONFIG
 
       - name: Build kernel Image + dtbs
         run: |
-          export PATH="$HOME/proton-clang/bin:$PATH"
           make -j$(nproc) CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm \
                OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip \
                CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64 \
