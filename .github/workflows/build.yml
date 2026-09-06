@@ -1,0 +1,53 @@
+name: Build Kernel 7.1
+
+on:
+  push:
+    branches: [ ci-config ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison flex libssl-dev libelf-dev curl xz-utils python3 git
+
+      - name: Install LLVM 17
+        run: |
+          curl -L https://github.com/terralang/llvm-build/releases/download/llvm-17.0.6/clang+llvm-17.0.6-x86_64-linux-gnu.tar.xz -o llvm.tar.xz
+          tar -xf llvm.tar.xz
+          sudo mv clang+llvm-17.0.6-x86_64-linux-gnu /opt/llvm-17
+
+      - name: Clone royka1 apollo-7.1 kernel
+        run: |
+          git clone --depth 1 -b apollo-7.1 https://gitlab.postmarketos.org/royka1/linux.git kernel
+          cd kernel
+          cp ../.config .
+          git log --oneline -1
+
+      - name: Build kernel
+        run: |
+          export PATH="/opt/llvm-17/bin:$PATH"
+          cd kernel
+          make LLVM=1 ARCH=arm64 olddefconfig
+          make LLVM=1 ARCH=arm64 -j$(nproc) Image dtbs 2>&1 | tail -50
+
+      - name: Verify Image
+        run: |
+          cd kernel
+          ls -la arch/arm64/boot/Image
+          echo "Image magic:" && xxd -l 4 arch/arm64/boot/Image
+          echo "apollo dtb:" && ls -la arch/arm64/boot/dts/qcom/sm8250-xiaomi-apollo.dtb
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-7.1-apollo
+          path: |
+            kernel/arch/arm64/boot/Image
+            kernel/arch/arm64/boot/dts/qcom/sm8250-xiaomi-apollo.dtb
+            kernel/.config
