@@ -18,7 +18,7 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: Install dependencies
       run: |
@@ -52,7 +52,7 @@ jobs:
         find arch/arm64/boot/dts -name "*apollo*" -o -name "*sm8250*" | head -5
         
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kernel-apollo-7.1
         path: |
