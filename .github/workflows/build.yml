@@ -24,7 +24,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
-          clang llvm lld aarch64-linux-gnu-gcc arm-linux-gnueabi-gcc \
+          clang llvm lld gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
           cpio python3 device-tree-compiler
           
     - name: Setup config
