@@ -1,0 +1,63 @@
+name: Build Kernel
+
+on:
+  push:
+    branches: [ apollo-7.1-source ]
+  workflow_dispatch:
+
+env:
+  CC: clang
+  CXX: clang++
+  ARCH: arm64
+  CROSS_COMPILE: aarch64-linux-gnu-
+  CROSS_COMPILE_ARM32: arm-linux-gnueabi-
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
+          clang llvm lld aarch64-linux-gnu-gcc arm-linux-gnueabi-gcc \
+          cpio python3 device-tree-compiler
+          
+    - name: Setup config
+      run: |
+        cp .config .config.bak
+        make ARCH=arm64 olddefconfig
+        # 确保关键驱动是内置的
+        scripts/config --enable DRM_MSM
+        scripts/config --enable SCSI_UFS_QCOM
+        scripts/config --enable I2C_QCOM_GENI
+        scripts/config --enable RPMSG_QCOM_GLINK_SMEM
+        scripts/config --enable SYSFB
+        scripts/config --enable SYSFB_SIMPLEFB
+        make ARCH=arm64 olddefconfig
+        
+    - name: Build kernel
+      run: |
+        make -j$(nproc) ARCH=arm64 CC=clang LLVM=1 Image dtbs 2>&1 | tail -50
+        
+    - name: Verify build
+      run: |
+        ls -la arch/arm64/boot/Image
+        ls -la arch/arm64/boot/dts/qcom/sm8250-xiaomi-apollo.dtb 2>/dev/null || \
+        ls -la arch/arm64/boot/dts/qcom/*apollo*.dtb 2>/dev/null || \
+        find arch/arm64/boot/dts -name "*apollo*" -o -name "*sm8250*" | head -5
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kernel-apollo-7.1
+        path: |
+          arch/arm64/boot/Image
+          arch/arm64/boot/Image.gz
+          arch/arm64/boot/dts/qcom/*.dtb
+          .config
+        retention-days: 30
